@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1= title
+
+  ul
+    book_list.sort((a, b) => {
+      textA = a.title.toUpperCase();
+      textB = a.title.toUpperCase();
+      return (textA < textB) ? -1 : (textA > textB) : 1 : 0;
+    })
+
+    each book in book_list
+      li
+        a(href=book.url) #{book.title}
+        |  (#{book.author.name})
+    else
+      li There are no books.
