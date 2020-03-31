@@ -84,7 +84,7 @@ router.get('/genre/:id/update', genre_controller.genre_update_get);
 router.post('/genre/:id/update', genre_controller.genre_update_post);
 
 // GET request for one Genre
-router.post('/genre/:id', genre_controller.genre_detail);
+router.get('/genre/:id', genre_controller.genre_detail);
 
 // GET request for list of all Genre
 router.get('/genres', genre_controller.genre_list);
