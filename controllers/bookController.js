@@ -2,7 +2,7 @@ const Book = require('../models/book');
 const Author = require('../models/author');
 const Genre = require('../models/genre');
 const BookInstance = require('../models/bookinstance');
-const { body, sanitizeBody, validationResult } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 
 exports.index = async function(req, res) {
   let counts = {};
