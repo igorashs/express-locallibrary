@@ -88,9 +88,7 @@ exports.author_create_post = [
         errors: errors.array()
       });
     } else {
-      const author = new Author(
-        ({ first_name, family_name, date_of_birth, date_of_death } = req.body)
-      );
+      const author = new Author({ ...req.body });
 
       author.save((err) => {
         if (err) {
