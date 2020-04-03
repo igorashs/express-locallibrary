@@ -102,13 +102,45 @@ exports.author_create_post = [
 ];
 
 // Display author delete form on GET
-exports.author_delete_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: Author delete GET');
+exports.author_delete_get = async function(req, res, err) {
+  try {
+    const author = Author.findById(req.params.id);
+    const author_books = Book.find({ author: req.params.id });
+
+    const results = { author: await author, author_books: await author_books };
+
+    if (results.author === null) {
+      res.redirect('/catalog/authors');
+    }
+
+    res.render('author_delete', { title: 'Delete Author', ...results });
+  } catch (err) {
+    return next(err);
+  }
 };
 
 // Handle author delete on POST
-exports.author_delete_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: Author delete POST');
+exports.author_delete_post = async function(req, res, next) {
+  try {
+    const author = Author.findById(req.body.authorid);
+    const author_books = Book.find({ author: req.body.authorid });
+
+    const results = { author: await author, author_books: await author_books };
+
+    if (results.author_books.length > 0) {
+      res.render('author_delete', { title: 'Delete Author', ...results });
+    } else {
+      Author.findByIdAndRemove(req.body.authorid, (err) => {
+        if (err) {
+          return next(err);
+        }
+
+        res.redirect('/catalog/authors');
+      });
+    }
+  } catch (err) {
+    return next(err);
+  }
 };
 
 // Display author update form on GET
