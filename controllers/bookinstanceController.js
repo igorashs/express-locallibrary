@@ -134,11 +134,79 @@ exports.bookinstance_delete_post = async function(req, res, next) {
 };
 
 // Display BookInstance update form on GET
-exports.bookinstance_update_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: BookInstance update GET');
+exports.bookinstance_update_get = async function(req, res, next) {
+  try {
+    const bookinstance = BookInstance.findById(req.params.id);
+    const book_list = Book.find({}, 'title');
+
+    const results = {
+      bookinstance: await bookinstance,
+      book_list: await book_list
+    };
+
+    if (bookinstance === null) {
+      const err = new Error('Book Instance not found');
+      err.status = 404;
+      return next(err);
+    }
+
+    res.render('bookinstance_form', {
+      title: 'Update Book Instance',
+      ...results
+    });
+  } catch (err) {
+    return next(err);
+  }
 };
 
 // Handle BookInstance update on POST
-exports.bookinstance_update_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: BookInstance update POST');
-};
+exports.bookinstance_update_post = [
+  body('book', 'Book must be specified')
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body('imprint', 'Imprint must be specified')
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body('due_back', 'Invalid date')
+    .optional({ checkFalsy: true })
+    .isISO8601()
+    .toDate(),
+  body('status')
+    .trim()
+    .escape(),
+
+  async (req, res, next) => {
+    const errors = validationResult(req);
+    const bookinstance = new BookInstance({ ...req.body, _id: req.params.id });
+
+    if (!errors.isEmpty()) {
+      try {
+        const book_list = await Book.find({}, 'title');
+
+        res.render('bookinstance_form', {
+          title: 'Update Book Instance',
+          bookinstance,
+          book_list,
+          errors: errors.array()
+        });
+      } catch (err) {
+        return next(err);
+      }
+    } else {
+      BookInstance.findByIdAndUpdate(
+        req.params.id,
+        bookinstance,
+        {},
+        (err, thebookinstance) => {
+          if (err) {
+            return next(err);
+          }
+
+          res.redirect(thebookinstance.url);
+        }
+      );
+    }
+  }
+];
