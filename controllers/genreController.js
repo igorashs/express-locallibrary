@@ -1,6 +1,6 @@
 const Genre = require('../models/genre');
 const Book = require('../models/book');
-const validator = require('express-validator');
+const { body, validationResult } = require('express-validator');
 
 // Display list of all Genre
 exports.genre_list = function(req, res, next) {
@@ -51,14 +51,13 @@ exports.genre_create_get = function(req, res) {
 
 // Handle Genre create on POST
 exports.genre_create_post = [
-  validator
-    .body('name', 'Genre name required')
+  body('name', 'Genre name required')
     .trim()
-    .isLength({ min: 1 }),
-  validator.sanitizeBody('name').escape(),
+    .isLength({ min: 1 })
+    .escape(),
 
   (req, res, next) => {
-    const errors = validator.validationResult(req);
+    const errors = validationResult(req);
 
     const genre = new Genre({ name: req.body.name });
 
