@@ -8,10 +8,16 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog');
 const compression = require('compression');
+const helmet = require('helmet');
 
 const env = require('./.env.config');
 
 var app = express();
+app.use(
+  helmet({
+    hidePoweredBy: { setTo: 'Hidden wizard' }
+  })
+);
 
 const mongoose = require('mongoose');
 const { mongoDB } = env;
